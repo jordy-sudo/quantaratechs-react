@@ -4,27 +4,27 @@ import { motion } from "framer-motion";
 export default function AboutOurApps() {
     const sectionData = [
         {
-            title: "Lightning-Fast Performance",
-            description: "Built with speed — minimal load times and optimized.",
+            title: "Automatización de procesos",
+            description: "Analizamos tus flujos críticos y los convertimos en procesos digitales medibles, reduciendo tiempos, retrabajos y errores operativos.",
             image: "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/aboutSection/flashEmoji.png",
             className: "py-10 border-b border-slate-700 md:py-0 md:border-r md:border-b-0 md:px-10"
         },
         {
-            title: "Beautifully Designed Components",
-            description: "Modern, pixel-perfect UI components ready for any project.",
+            title: "Bots y webscraping especializados",
+            description: "Construimos bots que consultan portales externos, resuelven captchas y extraen datos clave para integrarlos de forma segura a tus sistemas internos.",
             image: "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/aboutSection/colorsEmoji.png",
             className: "py-10 border-b border-slate-700 md:py-0 lg:border-r md:border-b-0 md:px-10"
         },
         {
-            title: "Plug-and-Play Integration",
-            description: "Simple setup with support for React, Next.js and Tailwind css.",
+            title: "Soluciones con Power Platform",
+            description: "Diseñamos apps con Power Apps y flujos con Power Automate para digitalizar formularios, aprobaciones y notificaciones sin perder gobierno ni seguridad.",
             image: "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/aboutSection/puzzelEmoji.png",
             className: "py-10 border-b border-slate-700 md:py-0 md:border-b-0 md:px-10"
         },
     ];
     return (
-        <section className="flex flex-col items-center" id="about">
-            <SectionTitle title="About our apps" description="A visual collection of our most recent works - each piece crafted with intention, emotion, and style." />
+        <section className="flex flex-col items-center" id="services">
+            <SectionTitle title="Servicios clave" description="Tecnología para ordenar y escalar tu operación con soluciones diseñadas para procesos, datos y control." />
             <div className="relative max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 px-8 md:px-0 mt-18">
                 {sectionData.map((data, index) => (
                     <motion.div key={data.title} className={data.className}

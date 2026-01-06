@@ -9,21 +9,21 @@ export default function OurLatestCreation() {
 
     const sectionData = [
         {
-            title: "Prompt engineers",
-            description: "Bridging the gap between human intent and machine understanding through expert prompt design.",
-            image: "https://images.unsplash.com/photo-1543269865-0a740d43b90c?q=80&w=800&h=400&auto=format&fit=crop",
+            title: "Tienda online orientada a conversión",
+            description: "Implementación de tienda con checkout optimizado, catálogo administrable y diseño adaptable a móvil.",
+            image: "https://www.quantaratechs.com/assets/images/tienda.webp",
             align: "object-center",
         },
         {
-            title: "Data scientists",
-            description: "Turning data into actionable insights that drive intelligent innovation and growth.",
-            image: "https://images.unsplash.com/photo-1714976326351-0ecf0244f0fc?q=80&w=800&h=400&auto=format&fit=crop",
+            title: "CRM para equipos comerciales",
+            description: "Centralización de clientes, oportunidades y seguimientos en un solo lugar, accesible desde web y móvil.",
+            image: "https://www.quantaratechs.com/assets/images/crm.png",
             align: "object-right",
         },
         {
-            title: "Software engineers",
-            description: "Building scalable and efficient systems that bring ideas to life through code.",
-            image: "https://images.unsplash.com/photo-1736220690062-79e12ca75262?q=80&w=800&h=400&auto=format&fit=crop",
+            title: "Portal de contenidos y noticias",
+            description: "Blog administrable con SEO técnico, búsquedas rápidas y organización por categorías y etiquetas.",
+            image: "https://www.quantaratechs.com/assets/images/blog.webp",
             align: "object-center",
         },
     ];
@@ -37,10 +37,10 @@ export default function OurLatestCreation() {
     }, [isHovered, sectionData.length]);
 
     return (
-        <section className="flex flex-col items-center" id="creations">
+        <section className="flex flex-col items-center" id="projects">
             <SectionTitle
-                title="Our latest creation"
-                description="A visual collection of our most recent works - each piece crafted with intention, emotion, and style."
+                title="Proyectos implementados"
+                description="Resultados reales con tecnología aplicada para convertir necesidades de negocio en soluciones digitales concretas."
             />
 
             <div className="flex items-center gap-4 h-100 w-full max-w-5xl mt-18 mx-auto" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} >
