@@ -14,18 +14,18 @@ export default function HeroSection() {
                 <rect x="-92" y="-948" width="1624" height="1624" rx="812" fill="url(#a)" />
                 <defs>
                     <radialGradient id="a" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="rotate(90 428 292)scale(812)">
-                        <stop offset=".63" stopColor="#372AAC" stopOpacity="0" />
-                        <stop offset="1" stopColor="#372AAC" />
+                        <stop offset=".63" stopColor="#3FA9F5" stopOpacity="0" />
+                        <stop offset="1" stopColor="#1E3A5F" />
                     </radialGradient>
                 </defs>
             </motion.svg>
-            <motion.a className="flex items-center mt-48 gap-2 border border-slate-600 text-gray-50 rounded-full px-4 py-2"
+            <motion.a className="flex items-center mt-48 gap-2 border border-brand-primary/70 text-gray-50 rounded-full px-4 py-2 bg-brand-deep/50"
                 initial={{ y: -20, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 320, damping: 70, mass: 1 }}
             >
-                <div className="size-2.5 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="size-2.5 bg-brand-accent rounded-full animate-pulse"></div>
                 <span>Soluciones digitales para tu negocio</span>
             </motion.a>
             <motion.h1 className="text-center text-5xl leading-[68px] md:text-6xl md:leading-[70px] mt-4 font-semibold max-w-2xl"
@@ -50,11 +50,11 @@ export default function HeroSection() {
                 viewport={{ once: true }}
                 transition={{ type: "spring", stiffness: 320, damping: 70, mass: 1 }}
             >
-                <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 transition text-white active:scale-95 rounded-lg px-7 h-11">
+                <button className="flex items-center gap-2 bg-brand-accent hover:bg-[#1E8FE2] transition text-brand-ink font-medium active:scale-95 rounded-lg px-7 h-11">
                     Agendar una reunión
                     <ArrowRight className="size-5" />
                 </button>
-                <button className="border border-slate-400 active:scale-95 hover:bg-white/10 transition rounded-lg px-8 h-11">
+                <button className="border border-brand-muted/70 active:scale-95 hover:bg-brand-primary/25 transition rounded-lg px-8 h-11">
                     Ver proyectos
                 </button>
             </motion.div>

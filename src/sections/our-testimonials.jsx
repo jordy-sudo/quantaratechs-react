@@ -16,20 +16,20 @@ export default function OurTestimonials() {
             <SectionTitle title="Servicios estratégicos" description="Soluciones diseñadas para ordenar la operación, integrar sistemas y automatizar tareas críticas." />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-18 max-w-6xl mx-auto">
                 {testimonials.map((testimonial, index) => (
-                    <motion.div key={testimonial.name} className="group border border-slate-800 p-6 rounded-xl"
+                    <motion.div key={testimonial.name} className="group border border-brand-primary/45 bg-brand-deep/20 p-6 rounded-lg"
                         initial={{ y: 150, opacity: 0 }}
                         whileInView={{ y: 0, opacity: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: `${index * 0.15}`, type: "spring", stiffness: 320, damping: 70, mass: 1 }}
                     >
-                        <p className="text-slate-100 text-base">{testimonial.quote}</p>
+                        <p className="text-white text-base">{testimonial.quote}</p>
                         <div className="flex items-center gap-3 mt-8 group-hover:-translate-y-1 duration-300">
                             <img className="size-10 rounded-full" src={testimonial.image} alt="user image" />
                             <div>
                                 <h2 className="text-gray-200 font-medium">
                                     {testimonial.name}
                                 </h2>
-                                <p className="text-indigo-500">{testimonial.role}</p>
+                                <p className="text-brand-accent">{testimonial.role}</p>
                             </div>
                         </div>
                     </motion.div>

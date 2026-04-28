@@ -3,10 +3,15 @@
 
 @theme {
     --font-poppins: "Poppins", sans-serif;
+    --color-brand-ink: #071625;
+    --color-brand-deep: #0B2136;
+    --color-brand-primary: #1E3A5F;
+    --color-brand-accent: #3FA9F5;
+    --color-brand-muted: #BFC7D5;
 }
 
 body {
-    @apply bg-black text-white text-sm font-poppins antialiased;
+    @apply bg-brand-ink text-white text-sm font-poppins antialiased;
 }
 
 button {
