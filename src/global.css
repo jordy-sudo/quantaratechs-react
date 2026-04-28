@@ -4,14 +4,17 @@
 @theme {
     --font-poppins: "Poppins", sans-serif;
     --color-brand-ink: #071625;
-    --color-brand-deep: #0B2136;
+    --color-brand-deep: #EAF4FF;
     --color-brand-primary: #1E3A5F;
     --color-brand-accent: #3FA9F5;
-    --color-brand-muted: #BFC7D5;
+    --color-brand-muted: #516274;
+    --color-brand-surface: #F7FBFF;
+    --color-brand-panel: #FFFFFF;
+    --color-brand-line: #C7D9EA;
 }
 
 body {
-    @apply bg-brand-ink text-white text-sm font-poppins antialiased;
+    @apply bg-brand-surface text-brand-ink text-sm font-poppins antialiased;
 }
 
 button {

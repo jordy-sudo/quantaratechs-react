@@ -1,6 +1,44 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 export default function Footer() {
+    const [status, setStatus] = useState("idle");
+    const [feedback, setFeedback] = useState("");
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+
+        setStatus("sending");
+        setFeedback("");
+
+        try {
+            const response = await fetch("/api/lead", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: formData.get("email"),
+                    source: "Hablemos de tu proyecto",
+                }),
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "No se pudo enviar el correo.");
+            }
+
+            form.reset();
+            setStatus("success");
+            setFeedback(data.message || "Correo enviado correctamente.");
+        } catch (error) {
+            setStatus("error");
+            setFeedback(error.message || "No se pudo enviar el correo.");
+        }
+    }
+
     return (
         <motion.footer className="px-6 md:px-16 lg:px-24 xl:px-32 w-full text-sm text-brand-muted mt-40"
             initial={{ opacity: 0 }}
@@ -17,7 +55,7 @@ export default function Footer() {
                 </div>
                 <div className="flex flex-col lg:items-center lg:justify-center">
                     <div className="flex flex-col text-sm space-y-2.5">
-                        <h2 className="font-semibold mb-5 text-white">QuantaraTechs</h2>
+                        <h2 className="font-semibold mb-5 text-brand-ink">QuantaraTechs</h2>
                         <a className="hover:text-brand-accent transition" href="#hero">Inicio</a>
                         <a className="hover:text-brand-accent transition" href="#services">Servicios</a>
                         <a className="hover:text-brand-accent transition" href="#projects">Proyectos</a>
@@ -25,17 +63,26 @@ export default function Footer() {
                     </div>
                 </div>
                 <div>
-                    <h2 className="font-semibold text-white mb-5">Hablemos de tu proyecto</h2>
+                    <h2 className="font-semibold text-brand-ink mb-5">Hablemos de tu proyecto</h2>
                     <div className="text-sm space-y-6 max-w-sm">
                         <p>Déjanos tu correo y te contactamos para revisar requerimientos y definir el siguiente paso.</p>
-                        <div className="flex items-center justify-center gap-2 p-2 rounded-md bg-brand-deep border border-brand-primary/40">
-                            <input className="outline-none w-full max-w-64 py-2 rounded px-2" type="email" placeholder="Ingresa tu correo" />
-                            <button className="bg-brand-accent px-4 py-2 text-brand-ink font-medium rounded">Enviar</button>
-                        </div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="flex items-center justify-center gap-2 p-2 rounded-md bg-white border border-brand-line shadow-sm">
+                                <input name="email" className="outline-none w-full max-w-64 py-2 rounded px-2" type="email" required placeholder="Ingresa tu correo" />
+                                <button disabled={status === "sending"} className="bg-brand-primary px-4 py-2 text-white font-medium rounded disabled:cursor-not-allowed disabled:opacity-70">
+                                    {status === "sending" ? "Enviando..." : "Enviar"}
+                                </button>
+                            </div>
+                            {feedback && (
+                                <p className={`mt-3 ${status === "success" ? "text-emerald-700" : "text-red-700"}`}>
+                                    {feedback}
+                                </p>
+                            )}
+                        </form>
                     </div>
                 </div>
             </div>
-            <p className="py-4 text-center border-t mt-6 border-brand-primary/50">
+            <p className="py-4 text-center border-t mt-6 border-brand-line">
                 © 2026 Quantara. Todos los derechos reservados.
             </p>
         </motion.footer>

@@ -13,7 +13,7 @@ export default function SectionTitle({ title, description }) {
                 transition={{ type: "spring", stiffness: 320, damping: 70, mass: 1 }}
             >
                 {firstPart}{" "}
-                <motion.span className="bg-gradient-to-t from-brand-primary to-brand-ink p-1 bg-left inline-block bg-no-repeat"
+                <motion.span className="bg-gradient-to-t from-brand-accent/30 to-transparent p-1 bg-left inline-block bg-no-repeat"
                     initial={{ backgroundSize: "0% 100%", }}
                     whileInView={{ backgroundSize: "100% 100%", }}
                     viewport={{ once: true }}
