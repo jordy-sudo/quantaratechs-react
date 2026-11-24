@@ -8,10 +8,14 @@ import Process from "./sections/process";
 import Faq from "./sections/faq";
 import Contact from "./sections/get-in-touch";
 import { track } from "./lib/analytics";
+import { useScrollReveal } from "./lib/use-scroll-reveal";
+import WhatsAppButton from "./components/whatsapp-button";
+import { CONTACT_EMAIL } from "../shared/site-contact";
 
 export default function App() {
+  useScrollReveal();
   const [service, setService] = useState("not-sure");
-  const [contactEmail, setContactEmail] = useState("");
+  const [contactEmail, setContactEmail] = useState(CONTACT_EMAIL);
   useEffect(() => {
     const controller = new AbortController();
     fetch("/api/public-config", { signal: controller.signal })
@@ -52,6 +56,7 @@ export default function App() {
         />
       </main>
       <Footer contactEmail={contactEmail} />
+      <WhatsAppButton />
     </>
   );
 }

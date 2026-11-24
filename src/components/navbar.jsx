@@ -34,12 +34,12 @@ export default function Navbar() {
   return (
     <header className="site-header">
       <nav className="container nav" aria-label="Navegación principal">
-        <a href="#hero" className="brand" aria-label="QuantaraTechs, inicio">
+        <a href="#hero" className="brand" aria-label="Quantara Techs, inicio">
           <img
-            src="/assets/logo.png"
-            width="139"
-            height="40"
-            alt="QuantaraTechs"
+            src="/assets/logo-wordmark.svg"
+            width="150"
+            height="48"
+            alt="Quantara Techs"
             fetchPriority="high"
           />
         </a>

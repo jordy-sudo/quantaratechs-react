@@ -46,18 +46,29 @@ const workflows = {
 export default function OperationsPreview() {
   const [active, setActive] = useState("sales");
   const [status, setStatus] = useState("idle");
+  const [completedSteps, setCompletedSteps] = useState(0);
   const timer = useRef(null);
   const flow = workflows[active];
   useEffect(() => () => clearTimeout(timer.current), []);
   function run() {
     if (status === "running") return;
+    clearTimeout(timer.current);
+    setCompletedSteps(0);
     setStatus("running");
-    timer.current = setTimeout(() => setStatus("done"), 1300);
+    function advance(step) {
+      timer.current = setTimeout(() => {
+        setCompletedSteps(step);
+        if (step === flow.tasks.length) setStatus("done");
+        else advance(step + 1);
+      }, 430);
+    }
+    advance(1);
   }
   function select(key) {
     clearTimeout(timer.current);
     setActive(key);
     setStatus("idle");
+    setCompletedSteps(0);
   }
   return (
     <div
@@ -71,7 +82,7 @@ export default function OperationsPreview() {
             <span className="q-mark" aria-hidden="true">
               Q
             </span>
-            Tu operación, conectada
+            Quantara Techs
           </span>
           <span className="demo-tag">Demo interactiva</span>
         </div>
@@ -104,7 +115,10 @@ export default function OperationsPreview() {
               { Icon: Workflow, title: flow.action },
               { Icon: Database, title: flow.target },
             ].map(({ Icon, title }, index) => (
-              <div className="pipeline-step" key={index}>
+              <div
+                className={`pipeline-step ${completedSteps > index ? "is-complete" : status === "running" && completedSteps === index ? "is-current" : ""}`}
+                key={index}
+              >
                 <span className="pipeline-icon">
                   <Icon size={23} />
                 </span>
@@ -127,9 +141,9 @@ export default function OperationsPreview() {
               {flow.tasks.map((task, index) => (
                 <li key={task}>
                   <span
-                    className={`task-check ${status === "done" ? "checked" : ""}`}
+                    className={`task-check ${completedSteps > index ? "checked" : ""}`}
                   >
-                    {status === "done" ? <Check size={13} /> : index + 1}
+                    {completedSteps > index ? <Check size={13} /> : index + 1}
                   </span>
                   {task}
                 </li>

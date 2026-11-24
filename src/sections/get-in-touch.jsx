@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { SERVICES, LIMITS } from "../../shared/contact";
 import { track } from "../lib/analytics";
+import { WHATSAPP_URL, WHATSAPP_DISPLAY } from "../../shared/site-contact";
 
 export default function Contact({ service, onServiceChange, contactEmail }) {
   const [status, setStatus] = useState("idle");
@@ -96,6 +97,26 @@ export default function Contact({ service, onServiceChange, contactEmail }) {
             </a>
           </div>
         )}
+        <div className="direct-contact contact-whatsapp">
+          <span>También podemos conversar por WhatsApp</span>
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() =>
+              track("whatsapp_click", { placement: "contact_section" })
+            }
+          >
+            <img
+              src="/assets/whatsapp.svg"
+              width="19"
+              height="19"
+              alt=""
+              aria-hidden="true"
+            />
+            {WHATSAPP_DISPLAY}
+          </a>
+        </div>
       </div>
       <form
         className="contact-form"
@@ -251,8 +272,8 @@ export default function Contact({ service, onServiceChange, contactEmail }) {
         <p className="eyebrow">Tu consulta</p>
         <h2 id="privacy-title">Cómo usamos tus datos</h2>
         <p>
-          QuantaraTechs recibe el nombre, correo, mensaje y los datos opcionales
-          que incluyas para analizar tu solicitud y responderte.
+          Quantara Techs recibe el nombre, correo, mensaje y los datos
+          opcionales que incluyas para analizar tu solicitud y responderte.
         </p>
         <p>
           La consulta se envía al buzón de contacto de la empresa mediante su

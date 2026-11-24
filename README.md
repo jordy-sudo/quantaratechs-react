@@ -1,6 +1,6 @@
-# QuantaraTechs
+# Quantara Techs
 
-Landing de QuantaraTechs con React, Vite y una API Express para enviar las consultas por SMTP. Los ejemplos de soluciones son ilustrativos: no representan clientes, testimonios ni resultados medidos.
+Landing de Quantara Techs con React, Vite y una API Express para enviar las consultas por SMTP. Los ejemplos de soluciones son ilustrativos: no representan clientes, testimonios ni resultados medidos.
 
 ## Desarrollo local
 
@@ -25,6 +25,8 @@ npm run mail:verify
 Esta orden comprueba conexión, TLS y autenticación sin enviar mensajes. Un error `EAUTH / 535` significa que el proveedor rechazó el inicio de sesión; no es una confirmación de entrega.
 
 `CONTACT_EMAIL` es el correo público que aparece en la web. Si no se define, se muestra `MAIL_USERNAME`. Se entrega mediante `/api/public-config`; esa ruta no devuelve contraseñas, servidor SMTP ni destinatarios internos.
+
+La cuenta comercial configurada es `Comercial@quantaratechs.com`, tanto para autenticación SMTP como para recibir consultas. Su contraseña de aplicación se configura únicamente en `MAIL_PASSWORD` dentro de `.env` o del entorno del servidor.
 
 El formulario único envía nombre, correo, empresa opcional, servicio y mensaje. El remitente es la cuenta autenticada y el correo del visitante se usa como `Reply-To`. El servidor valida tipos, longitudes y servicio, escapa HTML, limita el cuerpo a 16 KB y aplica un máximo de cinco solicitudes por IP cada 15 minutos. El contador reside en memoria del proceso; para varias instancias se requiere un almacén compartido compatible con express-rate-limit.
 
@@ -55,4 +57,8 @@ Las pruebas de Node cubren la entrega aceptada y rechazada mediante un transport
 
 `src/lib/analytics.js` prepara eventos `contact_cta_click`, `contact_error` y `generate_lead` en `window.dataLayer` y como eventos `quantara:analytics`. `generate_lead` solo se dispara tras un envío confirmado por la API. No se incluyen nombres, correos ni mensajes. El proveedor de analítica no está conectado: estos eventos quedan listos para integrarlo sin inventar un identificador de cuenta.
 
+`shared/site-contact.js` centraliza el correo comercial, el WhatsApp `+593 99 870 7704` y el mensaje de asesoría. El botón flotante permanece fijo a la derecha, respeta las áreas seguras del móvil y abre el chat con el mensaje preparado; el visitante decide cuándo enviarlo. Los clics generan `whatsapp_click`, sin contarlos como un mensaje recibido o una conversión confirmada. El icono procede de Simple Icons (CC0).
+
 Las fuentes Poppins se sirven localmente bajo la licencia incluida en `public/assets/fonts/OFL.txt`. La demostración de automatización y las vistas de soluciones se construyen en HTML/CSS y usan datos de ejemplo, sin imágenes externas ni dependencia del antiguo dominio de recursos.
+
+Las animaciones de entrada, aparición al desplazarse e interacción están en `src/animations.css`. `src/lib/use-scroll-reveal.js` utiliza IntersectionObserver y conserva el contenido visible cuando JavaScript no está disponible o el visitante prefiere movimiento reducido. El nombre visible de la empresa es **Quantara Techs**; el dominio continúa siendo `quantaratechs.com`.

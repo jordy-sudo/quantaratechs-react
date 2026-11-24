@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { SERVICES, LIMITS } from "../shared/contact.js";
 import { createMailTransport } from "./mail.js";
 import { organization } from "../shared/seo.js";
+import { CONTACT_EMAIL } from "../shared/site-contact.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 export const successMessage =
@@ -127,7 +128,7 @@ export function createApp({
   app.use(express.json({ limit: "16kb", strict: true }));
   app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
   app.get("/api/public-config", (_req, res) => {
-    const email = env.CONTACT_EMAIL || env.MAIL_USERNAME || "";
+    const email = env.CONTACT_EMAIL || env.MAIL_USERNAME || CONTACT_EMAIL;
     res.json({ contactEmail: validEmail(email) ? email : "" });
   });
   const limiter = rateLimit({
@@ -136,12 +137,10 @@ export function createApp({
     standardHeaders: "draft-8",
     legacyHeaders: false,
     handler: (_req, res) =>
-      res
-        .status(429)
-        .json({
-          message:
-            "Has enviado varias consultas. Espera 15 minutos o escríbenos directamente por correo.",
-        }),
+      res.status(429).json({
+        message:
+          "Has enviado varias consultas. Espera 15 minutos o escríbenos directamente por correo.",
+      }),
   });
   app.post("/api/contact", limiter, async (req, res) => {
     if (!req.is("application/json"))
@@ -160,11 +159,9 @@ export function createApp({
         /* malformed origins are rejected */
       }
       if (!sameOrigin)
-        return res
-          .status(403)
-          .json({
-            message: "Envía tu consulta desde la página de QuantaraTechs.",
-          });
+        return res.status(403).json({
+          message: "Envía tu consulta desde la página de Quantara Techs.",
+        });
     }
     const { data, error } = validate(req.body);
     if (error) return res.status(400).json({ message: error });
@@ -179,7 +176,7 @@ export function createApp({
           code: "ECONFIG",
         });
       const lines = [
-        "Nueva consulta desde QuantaraTechs",
+        "Nueva consulta desde Quantara Techs",
         `Referencia: ${requestId}`,
         "",
         `Nombre: ${data.name}`,
@@ -192,14 +189,17 @@ export function createApp({
       ];
       const info = await deliver({
         from: {
-          name: env.MAIL_FROM_NAME || "QuantaraTechs",
+          name: (env.MAIL_FROM_NAME || "Quantara Techs").replace(
+            /quantara\s*techs?/gi,
+            "Quantara Techs",
+          ),
           address: env.MAIL_USERNAME,
         },
         to,
         replyTo: { name: data.name, address: data.email },
-        subject: `Consulta QuantaraTechs: ${data.name}`,
+        subject: `Consulta Quantara Techs: ${data.name}`,
         text: lines.join("\n"),
-        html: `<h2>Nueva consulta desde QuantaraTechs</h2><p><strong>Referencia:</strong> ${requestId}</p><p><strong>Nombre:</strong> ${escape(data.name)}<br><strong>Correo:</strong> ${escape(data.email)}<br><strong>Empresa:</strong> ${escape(data.company || "No indicada")}<br><strong>Servicio:</strong> ${escape(service)}</p><h3>Mensaje</h3><p>${escape(data.message).replace(/\r?\n/g, "<br>")}</p>`,
+        html: `<h2>Nueva consulta desde Quantara Techs</h2><p><strong>Referencia:</strong> ${requestId}</p><p><strong>Nombre:</strong> ${escape(data.name)}<br><strong>Correo:</strong> ${escape(data.email)}<br><strong>Empresa:</strong> ${escape(data.company || "No indicada")}<br><strong>Servicio:</strong> ${escape(service)}</p><h3>Mensaje</h3><p>${escape(data.message).replace(/\r?\n/g, "<br>")}</p>`,
         disableFileAccess: true,
         disableUrlAccess: true,
       });

@@ -1,5 +1,6 @@
 import { createRoot, hydrateRoot } from "react-dom/client";
 import "./global.css";
+import "./animations.css";
 import App from "./App.jsx";
 
 const root = document.getElementById("root");

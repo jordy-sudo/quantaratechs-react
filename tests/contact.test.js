@@ -7,7 +7,7 @@ import { mailSettings } from "../server/mail.js";
 const env = {
   MAIL_USERNAME: "sender@example.com",
   MAIL_TO: "owner@example.com",
-  MAIL_FROM_NAME: "QuantaraTechs",
+  MAIL_FROM_NAME: "Quantara Techs",
 };
 const valid = {
   name: "Ana Pérez",

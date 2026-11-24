@@ -1,14 +1,17 @@
+import { WHATSAPP_URL, WHATSAPP_DISPLAY } from "../../shared/site-contact";
+import { track } from "../lib/analytics";
+
 export default function Footer({ contactEmail }) {
   return (
     <footer className="site-footer">
       <div className="container footer-grid">
         <div className="footer-brand">
-          <a href="#hero" aria-label="QuantaraTechs, inicio">
+          <a href="#hero" aria-label="Quantara Techs, inicio">
             <img
-              src="/assets/logo.png"
-              alt="QuantaraTechs"
-              width="139"
-              height="40"
+              src="/assets/logo-wordmark.svg"
+              alt="Quantara Techs"
+              width="150"
+              height="48"
               loading="lazy"
             />
           </a>
@@ -35,11 +38,20 @@ export default function Footer({ contactEmail }) {
               {contactEmail}
             </a>
           )}
+          <a
+            className="footer-whatsapp"
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => track("whatsapp_click", { placement: "footer" })}
+          >
+            WhatsApp: {WHATSAPP_DISPLAY}
+          </a>
         </div>
       </div>
       <div className="container footer-bottom">
         <p>
-          © {new Date().getFullYear()} QuantaraTechs. Todos los derechos
+          © {new Date().getFullYear()} Quantara Techs. Todos los derechos
           reservados.
         </p>
         <a href="#hero">Volver al inicio</a>
