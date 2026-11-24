@@ -1,10 +1,11 @@
-import { createRoot } from 'react-dom/client'
-import './global.css'
-import App from './App.jsx'
-import { BrowserRouter } from 'react-router-dom'
+import { createRoot, hydrateRoot } from "react-dom/client";
+import "./global.css";
+import App from "./App.jsx";
 
-createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>,
-)
+const root = document.getElementById("root");
+// Development is rendered normally; production includes prerendered HTML for SEO.
+if (root.hasChildNodes()) {
+  hydrateRoot(root, <App />);
+} else {
+  createRoot(root).render(<App />);
+}

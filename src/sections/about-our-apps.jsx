@@ -1,48 +1,72 @@
+import { Code2, Workflow, Database, Layers3 } from "lucide-react";
 import SectionTitle from "../components/section-title";
-import { motion } from "framer-motion";
-
-export default function AboutOurApps() {
-    const sectionData = [
-        {
-            title: "Automatización de procesos",
-            description: "Analizamos tus flujos críticos y los convertimos en procesos digitales medibles, reduciendo tiempos, retrabajos y errores operativos.",
-            image: "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/aboutSection/flashEmoji.png",
-            className: "py-10 border-b border-brand-line md:py-0 md:border-r md:border-b-0 md:px-10"
-        },
-        {
-            title: "Bots y webscraping especializados",
-            description: "Construimos bots que consultan portales externos, resuelven captchas y extraen datos clave para integrarlos de forma segura a tus sistemas internos.",
-            image: "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/aboutSection/colorsEmoji.png",
-            className: "py-10 border-b border-brand-line md:py-0 lg:border-r md:border-b-0 md:px-10"
-        },
-        {
-            title: "Soluciones con Power Platform",
-            description: "Diseñamos apps con Power Apps y flujos con Power Automate para digitalizar formularios, aprobaciones y notificaciones sin perder gobierno ni seguridad.",
-            image: "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/aboutSection/puzzelEmoji.png",
-            className: "py-10 border-b border-brand-line md:py-0 md:border-b-0 md:px-10"
-        },
-    ];
-    return (
-        <section className="flex flex-col items-center" id="services">
-            <SectionTitle title="Servicios clave" description="Tecnología para ordenar y escalar tu operación con soluciones diseñadas para procesos, datos y control." />
-            <div className="relative max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 px-8 md:px-0 mt-18">
-                {sectionData.map((data, index) => (
-                    <motion.div key={data.title} className={data.className}
-                        initial={{ y: 150, opacity: 0 }}
-                        whileInView={{ y: 0, opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: `${index * 0.15}`, type: "spring", stiffness: 320, damping: 70, mass: 1 }}
-                    >
-                        <div className="size-10 p-2 bg-brand-accent/15 border border-brand-accent/40 rounded">
-                            <img src={data.image} alt="" />
-                        </div>
-                        <div className="mt-5 space-y-2">
-                            <h3 className="text-base font-medium text-brand-ink">{data.title}</h3>
-                            <p className="text-sm text-brand-muted">{data.description}</p>
-                        </div>
-                    </motion.div>
-                ))}
+const services = [
+  {
+    id: "software",
+    Icon: Code2,
+    title: "Software a medida",
+    text: "Aplicaciones web que se adaptan a la forma en que trabaja tu empresa, desde una herramienta interna hasta un portal para tus clientes.",
+    tags: ["Aplicaciones web", "Portales y CRM"],
+  },
+  {
+    id: "automation",
+    Icon: Workflow,
+    title: "Automatización y bots",
+    text: "Transformamos tareas repetitivas en flujos automáticos: consultas, validaciones, reportes y seguimiento de procesos.",
+    tags: ["Bots especializados", "Flujos de trabajo"],
+  },
+  {
+    id: "integrations",
+    Icon: Database,
+    title: "Integraciones y datos",
+    text: "Conectamos APIs, archivos y bases de datos para que la información fluya entre tus herramientas y deje de depender de copiar y pegar.",
+    tags: ["APIs e integraciones", "Datos unificados"],
+  },
+  {
+    id: "platform",
+    Icon: Layers3,
+    title: "Power Platform y Azure",
+    text: "Creamos aplicaciones con Power Apps, flujos con Power Automate y soluciones en Azure alineadas a las necesidades de tu operación.",
+    tags: ["Power Apps y Automate", "Microsoft Azure"],
+  },
+];
+export default function Services({ onChooseService }) {
+  return (
+    <section
+      className="section container"
+      id="services"
+      aria-labelledby="services-title"
+    >
+      <SectionTitle
+        eyebrow="Lo que hacemos"
+        title="Tecnología a la medida de tu siguiente paso."
+        description="Unimos procesos, software y datos para resolver necesidades concretas de tu negocio."
+        id="services-title"
+      />
+      <div className="services-grid">
+        {services.map(({ id, Icon, title, text, tags }) => (
+          <article className="service-card" key={id}>
+            <div className="service-icon">
+              <Icon size={25} aria-hidden="true" />
             </div>
-        </section>
-    );
+            <h3>{title}</h3>
+            <p>{text}</p>
+            <div className="service-tags">
+              {tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+            <a
+              href="#contact"
+              className="text-link"
+              data-placement={`service-${id}`}
+              onClick={() => onChooseService(id)}
+            >
+              Consultar este servicio
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
 }

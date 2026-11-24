@@ -1,103 +1,274 @@
-import SectionTitle from "../components/section-title";
-import { ArrowUpRight, CheckCircle2 } from "lucide-react";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import {
+  CheckCircle2,
+  Mail,
+  LoaderCircle,
+  MessageSquare,
+  X,
+} from "lucide-react";
+import { SERVICES, LIMITS } from "../../shared/contact";
+import { track } from "../lib/analytics";
 
-export default function GetInTouch() {
-    const [status, setStatus] = useState("idle");
-    const [feedback, setFeedback] = useState("");
-
-    async function handleSubmit(e) {
-        e.preventDefault();
-        const form = e.currentTarget;
-        const formData = new FormData(form);
-        const payload = {
-            name: formData.get("name"),
-            email: formData.get("email"),
-            message: formData.get("message"),
-        };
-
-        setStatus("sending");
-        setFeedback("");
-
-        try {
-            const response = await fetch("/api/contact", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "No se pudo enviar el mensaje.");
-            }
-
-            form.reset();
-            setStatus("success");
-            setFeedback(data.message || "Mensaje enviado correctamente.");
-        } catch (error) {
-            setStatus("error");
-            setFeedback(error.message || "No se pudo enviar el mensaje.");
-        }
+export default function Contact({ service, onServiceChange, contactEmail }) {
+  const [status, setStatus] = useState("idle");
+  const [feedback, setFeedback] = useState("");
+  const [reference, setReference] = useState("");
+  const privacy = useRef(null);
+  const sending = useRef(false);
+  async function submit(event) {
+    event.preventDefault();
+    if (sending.current) return;
+    sending.current = true;
+    const form = event.currentTarget;
+    const data = Object.fromEntries(new FormData(form));
+    setStatus("sending");
+    setFeedback("");
+    setReference("");
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        signal: controller.signal,
+      });
+      const result = await response.json().catch(() => null);
+      if (result?.requestId) setReference(result.requestId);
+      if (!response.ok)
+        throw new Error(
+          result?.message ||
+            "No pudimos enviar tu mensaje. Inténtalo de nuevo o utiliza el correo de contacto.",
+        );
+      if (!result?.requestId)
+        throw new Error(
+          "No pudimos confirmar el envío. Escríbenos por correo para comprobarlo antes de volver a enviar.",
+        );
+      setStatus("success");
+      setFeedback(result.message);
+      setReference(result.requestId);
+      track("generate_lead", { service: data.service, method: "contact_form" });
+      form.reset();
+      onServiceChange("not-sure");
+    } catch (error) {
+      setStatus("error");
+      setFeedback(
+        error.name === "AbortError"
+          ? "La confirmación está tardando más de lo esperado. Puedes escribirnos por correo para comprobar tu consulta antes de volver a enviarla."
+          : error.message,
+      );
+      track("contact_error", { service: data.service });
+    } finally {
+      clearTimeout(timeout);
+      sending.current = false;
     }
-
-    return (
-        <section className="flex flex-col items-center" id="contact">
-            <SectionTitle title="Contacto directo" description="Cuéntanos qué necesitas y te proponemos una solución tecnológica alineada a tu negocio." />
-            <form onSubmit={handleSubmit} className='grid sm:grid-cols-2 gap-3 sm:gap-5 max-w-3xl mx-auto text-brand-muted mt-16 w-full' >
-                <motion.div
-                    initial={{ y: 150, opacity: 0 }}
-                    whileInView={{ y: 0, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ type: "spring", stiffness: 320, damping: 70, mass: 1 }}
+  }
+  return (
+    <section
+      className="section container contact-section"
+      id="contact"
+      aria-labelledby="contact-title"
+    >
+      <div className="contact-copy">
+        <p className="eyebrow">Construyamos el siguiente paso</p>
+        <h2 id="contact-title">Tu proyecto empieza con una conversación.</h2>
+        <p>
+          Cuéntanos qué quieres mejorar. Revisaremos tu consulta y te
+          responderemos al correo que nos indiques para definir cómo avanzar.
+        </p>
+        <div className="next-steps">
+          <MessageSquare size={23} aria-hidden="true" />
+          <div>
+            <h3>¿Qué sucede después?</h3>
+            <ol>
+              <li>Revisamos tu necesidad y el contexto de tu empresa.</li>
+              <li>Te contactamos para aclarar los detalles.</li>
+              <li>Definimos el alcance y una propuesta de trabajo.</li>
+            </ol>
+          </div>
+        </div>
+        {contactEmail && (
+          <div className="direct-contact">
+            <span>¿Prefieres escribirnos directamente?</span>
+            <a href={`mailto:${contactEmail}`}>
+              <Mail size={19} aria-hidden="true" />
+              {contactEmail}
+            </a>
+          </div>
+        )}
+      </div>
+      <form
+        className="contact-form"
+        onSubmit={submit}
+        aria-label="Cuéntanos tu proyecto"
+        aria-busy={status === "sending"}
+      >
+        <div className="form-intro">
+          <h3>Cuéntanos tu proyecto</h3>
+          <p>Nombre, correo y mensaje son obligatorios.</p>
+        </div>
+        <fieldset disabled={status === "sending"}>
+          <legend className="sr-only">Datos de contacto y proyecto</legend>
+          <div className="form-grid">
+            <div className="field">
+              <label htmlFor="contact-name">
+                Nombre <span aria-hidden="true">*</span>
+              </label>
+              <input
+                id="contact-name"
+                name="name"
+                autoComplete="name"
+                placeholder="Tu nombre"
+                required
+                minLength={2}
+                maxLength={LIMITS.name}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="contact-email">
+                Correo electrónico <span aria-hidden="true">*</span>
+              </label>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="tu@empresa.com"
+                required
+                maxLength={LIMITS.email}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="contact-company">
+                Empresa <span className="optional">(opcional)</span>
+              </label>
+              <input
+                id="contact-company"
+                name="company"
+                autoComplete="organization"
+                placeholder="Nombre de tu empresa"
+                maxLength={LIMITS.company}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="contact-service">¿Qué necesitas?</label>
+              <div className="select-wrap">
+                <select
+                  id="contact-service"
+                  name="service"
+                  value={service}
+                  onChange={(event) => onServiceChange(event.target.value)}
                 >
-                    <label className='font-medium text-brand-ink'>Nombre</label>
-                    <input name='name' type="text" placeholder='Ingresa tu nombre' required className='w-full mt-2 p-3 outline-none border border-brand-line bg-white rounded-lg focus-within:ring-1 transition focus:ring-brand-accent' />
-                </motion.div>
-
-                <motion.div
-                    initial={{ y: 150, opacity: 0 }}
-                    whileInView={{ y: 0, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ type: "spring", stiffness: 280, damping: 70, mass: 1 }}
-                >
-                    <label className='font-medium text-brand-ink'>Correo electrónico</label>
-                    <input name='email' type="email" placeholder='Ingresa tu correo' required className='w-full mt-2 p-3 outline-none border border-brand-line bg-white rounded-lg focus-within:ring-1 transition focus:ring-brand-accent' />
-                </motion.div>
-
-                <motion.div className='sm:col-span-2'
-                    initial={{ y: 150, opacity: 0 }}
-                    whileInView={{ y: 0, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ type: "spring", stiffness: 240, damping: 70, mass: 1 }}
-                >
-                    <label className='font-medium text-brand-ink'>Mensaje</label>
-                    <textarea name='message' rows={8} placeholder='Cuéntanos sobre tu proyecto' required className='resize-none w-full mt-2 p-3 outline-none rounded-lg focus-within:ring-1 transition focus:ring-brand-accent border border-brand-line bg-white' />
-                </motion.div>
-
-                {feedback && (
-                    <motion.p
-                        className={`sm:col-span-2 flex items-center gap-2 rounded-lg border px-4 py-3 ${status === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-red-200 bg-red-50 text-red-700"}`}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
-                        {status === "success" && <CheckCircle2 className="size-4" />}
-                        {feedback}
-                    </motion.p>
+                  {SERVICES.map((item) => (
+                    <option value={item.id} key={item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="field field-full">
+              <label htmlFor="contact-message">
+                Tu proyecto <span aria-hidden="true">*</span>
+              </label>
+              <textarea
+                id="contact-message"
+                name="message"
+                rows={5}
+                placeholder="¿Qué proceso te gustaría automatizar o qué solución necesitas construir?"
+                required
+                minLength={LIMITS.messageMin}
+                maxLength={LIMITS.message}
+                aria-describedby="message-help"
+              />
+              <p id="message-help" className="field-hint">
+                Incluye al menos 20 caracteres para ayudarnos a entender tu
+                idea.
+              </p>
+            </div>
+            <div className="honeypot" aria-hidden="true">
+              <label htmlFor="contact-website">Deja este campo vacío</label>
+              <input
+                id="contact-website"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+          </div>
+        </fieldset>
+        <p className="privacy-note">
+          Usaremos tus datos para responder a esta consulta.{" "}
+          <button
+            type="button"
+            className="text-link"
+            onClick={() => privacy.current.showModal()}
+          >
+            Información de privacidad
+          </button>
+        </p>
+        <div role="status" aria-live="polite" aria-atomic="true">
+          {feedback && (
+            <div className={`form-feedback ${status}`}>
+              {status === "success" && (
+                <CheckCircle2 size={20} aria-hidden="true" />
+              )}
+              <div>
+                <p>{feedback}</p>
+                {reference && (
+                  <p className="request-reference">Referencia: {reference}</p>
                 )}
-
-                <motion.button type='submit' disabled={status === "sending"} className='w-max flex items-center gap-2 bg-brand-primary hover:bg-[#132C49] text-white font-medium px-8 py-3 rounded-full disabled:cursor-not-allowed disabled:opacity-70'
-                    initial={{ y: 150, opacity: 0 }}
-                    whileInView={{ y: 0, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ type: "spring", stiffness: 280, damping: 70, mass: 1 }}
-                >
-                    {status === "sending" ? "Enviando..." : "Enviar mensaje"}
-                    <ArrowUpRight className="size-4.5" />
-                </motion.button>
-            </form>
-        </section>
-    );
+              </div>
+            </div>
+          )}
+        </div>
+        <button
+          className="button button-primary submit-button"
+          type="submit"
+          disabled={status === "sending"}
+        >
+          {status === "sending" && (
+            <LoaderCircle className="spinner" size={18} aria-hidden="true" />
+          )}
+          {status === "sending" ? "Enviando tu mensaje…" : "Enviar mi consulta"}
+        </button>
+      </form>
+      <dialog
+        className="content-dialog"
+        ref={privacy}
+        aria-labelledby="privacy-title"
+        onClick={(event) => {
+          if (event.target === privacy.current) privacy.current.close();
+        }}
+      >
+        <button
+          className="dialog-close"
+          aria-label="Cerrar información de privacidad"
+          onClick={() => privacy.current.close()}
+        >
+          <X aria-hidden="true" />
+        </button>
+        <p className="eyebrow">Tu consulta</p>
+        <h2 id="privacy-title">Cómo usamos tus datos</h2>
+        <p>
+          QuantaraTechs recibe el nombre, correo, mensaje y los datos opcionales
+          que incluyas para analizar tu solicitud y responderte.
+        </p>
+        <p>
+          La consulta se envía al buzón de contacto de la empresa mediante su
+          proveedor de correo. Este formulario no te suscribe a publicidad.
+        </p>
+        <p>
+          Evita incluir contraseñas o información confidencial en el mensaje.
+          Puedes solicitar información sobre tu consulta o pedir la eliminación
+          de tus datos a través del correo de contacto.
+        </p>
+        {contactEmail && (
+          <a className="text-link" href={`mailto:${contactEmail}`}>
+            {contactEmail}
+          </a>
+        )}
+      </dialog>
+    </section>
+  );
 }

@@ -1,64 +1,62 @@
-import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
-import TiltedImage from "../components/tilt-image";
-
-export default function HeroSection() {
-    return (
-        <section className="flex flex-col items-center -mt-18" id="hero">
-            <motion.svg className="absolute -z-10 w-full -mt-40 md:mt-0" width="1440" height="676" viewBox="0 0 1440 676" fill="none" xmlns="http://www.w3.org/2000/svg"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5}}
+import { Check, Code2, Workflow, Database } from "lucide-react";
+import OperationsPreview from "../components/operations-preview";
+export default function Hero() {
+  return (
+    <>
+      <section
+        className="hero section container"
+        id="hero"
+        aria-labelledby="hero-title"
+      >
+        <div className="hero-copy">
+          <p className="eyebrow">
+            Software con propósito. Tecnología con impacto.
+          </p>
+          <h1 id="hero-title">
+            Automatiza tu operación.
+            <br />
+            <span>Conecta tu negocio.</span>
+          </h1>
+          <p className="hero-description">
+            Desarrollamos software a medida, bots e integraciones para reducir
+            tareas manuales y centralizar la información de tu empresa.
+          </p>
+          <div className="hero-actions">
+            <a
+              href="#contact"
+              className="button button-primary"
+              data-placement="hero"
             >
-                <rect x="-92" y="-948" width="1624" height="1624" rx="812" fill="url(#a)" />
-                <defs>
-                    <radialGradient id="a" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="rotate(90 428 292)scale(812)">
-                        <stop offset=".58" stopColor="#3FA9F5" stopOpacity="0" />
-                        <stop offset="1" stopColor="#D9EEFF" />
-                    </radialGradient>
-                </defs>
-            </motion.svg>
-            <motion.a className="flex items-center mt-48 gap-2 border border-brand-line text-brand-primary rounded-full px-4 py-2 bg-white/75 shadow-sm"
-                initial={{ y: -20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 320, damping: 70, mass: 1 }}
-            >
-                <div className="size-2.5 bg-brand-accent rounded-full animate-pulse"></div>
-                <span>Soluciones digitales para tu negocio</span>
-            </motion.a>
-            <motion.h1 className="text-center text-5xl leading-[68px] md:text-6xl md:leading-[70px] mt-4 font-semibold max-w-2xl"
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", stiffness: 240, damping: 70, mass: 1 }}
-            >
-                Transformamos problemas en soluciones digitales fiables
-            </motion.h1>
-            <motion.p className="text-center text-base max-w-lg mt-2"
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 320, damping: 70, mass: 1 }}
-            >
-                Desarrollamos software, integraciones y automatizaciones a la medida.
-            </motion.p>
-            <motion.div className="flex items-center gap-4 mt-8"
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", stiffness: 320, damping: 70, mass: 1 }}
-            >
-                <a href="#contact" className="flex items-center gap-2 bg-brand-primary hover:bg-[#132C49] transition text-white font-medium active:scale-95 rounded-lg px-7 h-11">
-                    Agendar una reunión
-                    <ArrowRight className="size-5" />
-                </a>
-                <a href="#projects" className="inline-flex items-center border border-brand-line active:scale-95 hover:bg-brand-deep transition rounded-lg px-8 h-11">
-                    Ver proyectos
-                </a>
-            </motion.div>
-            <TiltedImage />
-        </section>
-    );
+              Cuéntanos tu proyecto
+            </a>
+            <a href="#projects" className="button button-secondary">
+              Explorar soluciones
+            </a>
+          </div>
+          <p className="hero-note">
+            <Check size={17} aria-hidden="true" />
+            Diseñamos la solución a partir de tus procesos.
+          </p>
+        </div>
+        <OperationsPreview />
+      </section>
+      <div className="capabilities-strip">
+        <div className="container capabilities-inner">
+          <p>De la idea a una operación conectada.</p>
+          <span>
+            <Code2 aria-hidden="true" size={19} />
+            Software a medida
+          </span>
+          <span>
+            <Workflow aria-hidden="true" size={19} />
+            Procesos automáticos
+          </span>
+          <span>
+            <Database aria-hidden="true" size={19} />
+            Datos centralizados
+          </span>
+        </div>
+      </div>
+    </>
+  );
 }
