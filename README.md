@@ -47,6 +47,22 @@ Configura `NODE_ENV=production`, `SITE_URL` y las variables SMTP en el servidor.
 
 Las pruebas de Node cubren la entrega aceptada y rechazada mediante un transporte simulado, validaciones, inyección de cabeceras, escape HTML, límites de envío, orígenes, cuerpos inválidos y rutas inexistentes. No envían correos reales.
 
+## Despliegue en Netlify
+
+`netlify.toml` configura Node.js 24, `npm run build`, la publicación de `dist/` y las funciones de `netlify/functions/`. La función `api` publica `/api/*` mediante su configuración de rutas y reutiliza la API Express, sin iniciar un servidor con `listen`. Netlify sirve los archivos de la web desde su CDN. El proxy de Vite solo se usa en desarrollo; publicar únicamente `dist/` deja la API sin desplegar y produce un 404 al enviar el formulario.
+
+En **Project configuration → Environment variables** de Netlify, configura las siguientes variables para el contexto de producción y con alcance **Functions** (o todos los alcances):
+
+- `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME` y `MAIL_PASSWORD`: los datos SMTP del proveedor; `MAIL_PASSWORD` debe contener la contraseña de aplicación real.
+- `MAIL_TO`, `MAIL_FROM_NAME` y `MAIL_ENCRYPTION`: los valores correspondientes de `.env.example`.
+- `CONTACT_EMAIL=Comercial@quantaratechs.com` y `SITE_URL=https://www.quantaratechs.com`.
+
+Configura las credenciales en el panel, CLI o API de Netlify: el archivo `.env` local no se publica y las variables declaradas en `netlify.toml` no llegan a las funciones en ejecución. Después de guardar las variables, despliega el repositorio completo mediante la integración Git de Netlify. Arrastrar solo `dist/` al panel no publica esta API. Cada cambio de variables requiere un nuevo despliegue.
+
+Comprueba que `/api/health` responde `200` con `{"status":"ok"}` y `/api/public-config` devuelve el correo público en JSON. Envía una consulta desde el formulario y verifica la referencia de envío y su llegada al buzón. Un `503` con referencia indica que la API ya funciona pero falló la configuración o entrega SMTP; revisa el código de error en los logs de la función `api`.
+
+El adaptador usa la IP que Netlify entrega en `context.ip`, sin depender de `TRUST_PROXY_HOPS` ni de cabeceras enviadas por el visitante. El límite de solicitudes se conserva en cada instancia activa de la función; varias instancias o un arranque nuevo tienen contadores independientes. Las pruebas también ejecutan el adaptador de Netlify con solicitudes web reales y transporte SMTP simulado.
+
 ## Contenido y medición
 
 - `src/sections/about-our-apps.jsx`: servicios ofrecidos.
