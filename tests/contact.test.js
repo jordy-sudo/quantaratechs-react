@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import { createApp } from "../server/app.js";
-import { mailSettings } from "../server/mail.js";
+import { mailSettings, mailErrorDetails } from "../server/mail.js";
 
 const env = {
   MAIL_USERNAME: "sender@example.com",
@@ -116,6 +116,42 @@ test("SMTP authentication failure is a 503 with a generic message and a referenc
   assert.ok(!JSON.stringify(body).includes("secret"));
   assert.ok(!JSON.stringify(body).includes("535"));
 });
+
+test("SMTP socket failures log the original system cause without exposing it to visitors", async (t) => {
+  const logs = [];
+  const { post } = await setup(t, {
+    logger: {
+      info() {},
+      error(line) {
+        logs.push(JSON.parse(line));
+      },
+    },
+    sendMail: async () => {
+      throw Object.assign(new Error("secret-user secret-password"), {
+        code: "ESOCKET",
+        originalCode: "ERR_SSL_WRONG_VERSION_NUMBER",
+        command: "CONN",
+        response: "private provider response",
+      });
+    },
+  });
+  const response = await post(valid);
+  const body = await response.json();
+  assert.equal(response.status, 503);
+  assert.deepEqual(logs, [
+    {
+      event: "contact_failed",
+      requestId: body.requestId,
+      code: "ESOCKET",
+      originalCode: "ERR_SSL_WRONG_VERSION_NUMBER",
+      command: "CONN",
+    },
+  ]);
+  assert.ok(!JSON.stringify(logs).includes("secret"));
+  assert.ok(!JSON.stringify(logs).includes("private"));
+  assert.ok(!JSON.stringify(body).includes("ESOCKET"));
+  assert.ok(!JSON.stringify(body).includes("ERR_SSL"));
+});
 test("no accepted recipient or partial rejection never reports success", async (t) => {
   for (const info of [
     { accepted: [], rejected: ["owner@example.com"] },
@@ -198,4 +234,42 @@ test("SMTP transport requires configuration and enforces TLS and finite timeouts
   assert.equal(options.requireTLS, true);
   assert.equal(options.tls.minVersion, "TLSv1.2");
   assert.ok(options.socketTimeout < 30000);
+});
+
+test("SMTP port determines TLS mode even when the legacy encryption variable conflicts", () => {
+  for (const [port, encryption, secure] of [
+    [465, "ssl", true],
+    [465, "tls", true],
+    [587, "tls", false],
+    [587, "ssl", false],
+    [2525, "ssl", false],
+    [25, "ssl", false],
+  ]) {
+    const options = mailSettings({
+      MAIL_HOST: "smtp.example.com",
+      MAIL_PORT: String(port),
+      MAIL_USERNAME: "sender@example.com",
+      MAIL_PASSWORD: "secret",
+      MAIL_ENCRYPTION: encryption,
+    });
+    assert.equal(options.secure, secure, `port ${port}, encryption ${encryption}`);
+    assert.equal(options.requireTLS, !secure);
+    assert.equal(options.tls.rejectUnauthorized, undefined);
+  }
+});
+
+test("SMTP diagnostics omit raw errors, provider replies and unexpected command data", () => {
+  const details = mailErrorDetails({
+    code: "ESOCKET",
+    originalCode: "secret-password\nECONNRESET",
+    command: "AUTH PLAIN secret-password",
+    message: "secret-password",
+    response: "private provider response",
+    responseCode: "private provider response",
+    timeoutType: "CONNECT_TIMEOUT",
+  });
+  assert.deepEqual(JSON.parse(JSON.stringify(details)), {
+    code: "ESOCKET",
+    timeoutType: "CONNECT_TIMEOUT",
+  });
 });

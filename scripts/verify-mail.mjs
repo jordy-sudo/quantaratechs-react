@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { createMailTransport } from "../server/mail.js";
+import { createMailTransport, mailErrorDetails } from "../server/mail.js";
 let transport;
 try {
   transport = createMailTransport();
@@ -9,9 +9,11 @@ try {
     "Esta comprobación no envía correos. El envío se verifica desde el formulario.",
   );
 } catch (error) {
+  const details = mailErrorDetails(error);
   console.error(
-    `SMTP: comprobación fallida (${error.code || "EMAIL"}${error.responseCode ? `, respuesta ${error.responseCode}` : ""}).`,
+    `SMTP: comprobación fallida (${details.code}${details.responseCode ? `, respuesta ${details.responseCode}` : ""}).`,
   );
+  console.error(JSON.stringify({ event: "smtp_verify_failed", ...details }));
   if (error.code === "EAUTH")
     console.error(
       "Revisa MAIL_USERNAME y MAIL_PASSWORD en .env. Si Zoho usa doble factor, utiliza una contraseña de aplicación.",

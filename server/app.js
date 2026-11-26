@@ -6,7 +6,7 @@ import { randomUUID, createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { SERVICES, LIMITS } from "../shared/contact.js";
-import { createMailTransport } from "./mail.js";
+import { createMailTransport, mailErrorDetails } from "./mail.js";
 import { organization } from "../shared/seo.js";
 import { CONTACT_EMAIL } from "../shared/site-contact.js";
 
@@ -220,8 +220,7 @@ export function createApp({
         JSON.stringify({
           event: "contact_failed",
           requestId,
-          code: error.code || "EMAIL",
-          responseCode: error.responseCode,
+          ...mailErrorDetails(error),
         }),
       );
       return res.status(503).json({ message: errorMessage, requestId });

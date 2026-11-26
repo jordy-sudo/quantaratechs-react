@@ -16,6 +16,8 @@ La web se abre en http://localhost:5173 y la API en http://127.0.0.1:3001. Vite 
 
 `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME` y `MAIL_PASSWORD` son obligatorias. `MAIL_TO` indica el destinatario; si está vacío, se usa `MAIL_USERNAME`. `MAIL_FROM_NAME` configura el nombre del remitente. El puerto 465 usa TLS directo; 587 usa STARTTLS obligatorio. No se desactiva la validación de certificados.
 
+El modo TLS se elige por `MAIL_PORT`: 465 usa TLS directo y 587, 2525 o 25 exigen STARTTLS. `MAIL_ENCRYPTION` es una variable heredada y no modifica esa selección; así, conservar `ssl` al cambiar al puerto 587 no inicia un protocolo incorrecto.
+
 Para Zoho, confirma el servidor correspondiente a tu cuenta y región en su configuración SMTP. Si la cuenta utiliza doble factor, genera una contraseña de aplicación. Conserva las credenciales únicamente en `.env` o en las variables del servidor, nunca en `VITE_*`, el frontend ni Git.
 
 ```sh
@@ -60,6 +62,8 @@ En **Project configuration → Environment variables** de Netlify, configura las
 Configura las credenciales en el panel, CLI o API de Netlify: el archivo `.env` local no se publica y las variables declaradas en `netlify.toml` no llegan a las funciones en ejecución. Después de guardar las variables, despliega el repositorio completo mediante la integración Git de Netlify. Arrastrar solo `dist/` al panel no publica esta API. Cada cambio de variables requiere un nuevo despliegue.
 
 Comprueba que `/api/health` responde `200` con `{"status":"ok"}` y `/api/public-config` devuelve el correo público en JSON. Envía una consulta desde el formulario y verifica la referencia de envío y su llegada al buzón. Un `503` con referencia indica que la API ya funciona pero falló la configuración o entrega SMTP; revisa el código de error en los logs de la función `api`.
+
+En **Cloud compute → Functions → api**, busca `contact_failed`. Los logs incluyen `code`, `originalCode`, `command` y `timeoutType` cuando están disponibles, además de `responseCode`. No registran contraseñas, respuestas completas del proveedor ni el contenido del formulario. `ESOCKET` es una categoría general: `originalCode` permite distinguir, por ejemplo, un protocolo TLS incorrecto (`ERR_SSL_WRONG_VERSION_NUMBER`), un certificado inválido o una conexión rechazada (`ECONNREFUSED`). No basta con `ESOCKET` para atribuir el fallo a un bloqueo del hosting.
 
 El adaptador usa la IP que Netlify entrega en `context.ip`, sin depender de `TRUST_PROXY_HOPS` ni de cabeceras enviadas por el visitante. El límite de solicitudes se conserva en cada instancia activa de la función; varias instancias o un arranque nuevo tienen contadores independientes. Las pruebas también ejecutan el adaptador de Netlify con solicitudes web reales y transporte SMTP simulado.
 
